@@ -1,5 +1,6 @@
 package com.onkar.springai.services;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -8,6 +9,8 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.onkar.springai.text.prompttemplate.dtos.CountryCuisines;
@@ -16,6 +19,9 @@ import com.onkar.springai.text.prompttemplate.dtos.CountryCuisines;
 public class OllamaService {
 
 	private ChatClient chatClient;
+	
+	@Autowired
+	private EmbeddingModel embeddingModel;
 
 	public OllamaService(ChatClient.Builder builder, ChatMemory chatMemory) {
 //		System.err.println("constructor being called!!!!");
@@ -67,4 +73,35 @@ public class OllamaService {
 		return chatClient.prompt(prompt).call().chatResponse().getResult().getOutput().getText();
 	}
 	
+	public float[] getEmbed(String text) {
+		return embeddingModel.embed(text);
+	}
+	
+	public double findSimilarity(String text1, String text2) throws Exception {
+		List<float[]> floatVectors = embeddingModel.embed(List.of(text1, text2));
+		return findCosineSimilarity(floatVectors.get(0), floatVectors.get(1));
+		
+	}
+	
+	public double findCosineSimilarity(float[] vector1, float[] vector2) throws Exception {
+		if(vector1.length != vector2.length) {
+			throw new Exception("Vectors must be of same length!");
+		}else {
+			//Initialize variables for dot product and magnitudes
+			double dotProduct = 0.0;
+			double magnitudeA = 0.0;
+			double magnitudeB = 0.0;
+			
+			//Calculateb dot product and magnitude
+			for(int i = 0; i < vector1.length; i++) {
+				dotProduct += vector1[i] * vector2[i];
+				magnitudeA += vector1[i] * vector1[i];
+				magnitudeB += vector2[i] * vector2[i];
+			}
+			
+			//Calculate and return cosine similarity
+			
+			return (dotProduct / (Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB)) * 100);
+		}
+	}
 }

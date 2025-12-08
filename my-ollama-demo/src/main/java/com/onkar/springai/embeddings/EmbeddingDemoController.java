@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.onkar.springai.services.OllamaService;
 
 @Controller
-public class EmbeddingDemo {
+public class EmbeddingDemoController {
 
 	@Autowired
 	private OllamaService service;
@@ -23,6 +23,8 @@ public class EmbeddingDemo {
 
 	@PostMapping("/embedding")
 	public String embed(@RequestParam String text,Model model) {
+		float[] response = service.getEmbed(text);
+		model.addAttribute("response",response);
 		return "embedDemo";
 
 	}
