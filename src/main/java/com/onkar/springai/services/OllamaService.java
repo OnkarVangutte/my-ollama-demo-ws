@@ -12,6 +12,9 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.moderation.ModerationModel;
+import org.springframework.ai.moderation.ModerationPrompt;
+import org.springframework.ai.moderation.ModerationResult;
 //import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -27,6 +30,9 @@ public class OllamaService {
 	
 	@Autowired
 	private EmbeddingModel embeddingModel;
+	
+	@Autowired
+	private ModerationModel moderationModel;
 	
 //	@Autowired
 //	private VectorStore vectorStore;
@@ -146,5 +152,9 @@ public class OllamaService {
 		String response = chatClient.prompt(query).tools(new WeatherTools()).call().content();
 		System.out.println("weather response : "+response);
 		return response;
+	}
+	
+	public ModerationResult getModerationStatus(String prompt) {
+		return moderationModel.call(new ModerationPrompt(prompt)).getResult().getOutput().getResults().get(0);
 	}
 }
