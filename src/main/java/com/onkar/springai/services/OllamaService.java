@@ -141,4 +141,10 @@ public class OllamaService {
 				.content();
 		return response;
 	}
+	
+	public String callAgent(String query) {
+		String response = chatClient.prompt(query).tools(new WeatherTools()).call().content();
+		System.out.println("weather response : "+response);
+		return response;
+	}
 }
