@@ -22,7 +22,7 @@ public class ModerationController {
 
     @PostMapping("/moderation")
     public String getChatResponse(@RequestParam("text") String text, Model model) {
-    	model.addAttribute("response", chatService.getModerationStatus(text));
+//    	model.addAttribute("response", chatService.getModerationStatus(text));
         return "moderation";
     }
 }

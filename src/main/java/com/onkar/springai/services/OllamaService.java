@@ -23,6 +23,8 @@ import org.springframework.util.MimeTypeUtils;
 
 import com.onkar.springai.text.prompttemplate.dtos.CountryCuisines;
 
+import reactor.core.publisher.Flux;
+
 @Service
 public class OllamaService {
 
@@ -31,8 +33,8 @@ public class OllamaService {
 	@Autowired
 	private EmbeddingModel embeddingModel;
 	
-	@Autowired
-	private ModerationModel moderationModel;
+//	@Autowired
+//	private ModerationModel moderationModel;
 	
 //	@Autowired
 //	private VectorStore vectorStore;
@@ -154,7 +156,15 @@ public class OllamaService {
 		return response;
 	}
 	
-	public ModerationResult getModerationStatus(String prompt) {
-		return moderationModel.call(new ModerationPrompt(prompt)).getResult().getOutput().getResults().get(0);
+//	public ModerationResult getModerationStatus(String prompt) {
+//		return moderationModel.call(new ModerationPrompt(prompt)).getResult().getOutput().getResults().get(0);
+//	}
+	
+	public Flux<String> generateStreamAnswer(String message) {
+		return chatClient.prompt(message).stream().content();
+	}
+	
+	public Flux<ChatResponse> generateStreamAnsWithMetaData(String message) {
+		return chatClient.prompt(message).stream().chatResponse();
 	}
 }
